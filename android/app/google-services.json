@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "691998612748",
+    "project_id": "flutterchat-eb1a3",
+    "storage_bucket": "flutterchat-eb1a3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691998612748:android:74218ec12c26b826197d29",
+        "android_client_info": {
+          "package_name": "com.ashok.flutter_firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "691998612748-lfl205lae334vk0m1fnlh88fu725demi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ashok.flutter_firebase",
+            "certificate_hash": "71ade53fc00afa1a378f0ee4a38515a186ea7a1e"
+          }
+        },
+        {
+          "client_id": "691998612748-ebbld2ohu9j6ln3dlvjc8u9hk1pt3k97.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaDMzyJorjo8Z7cPzC_b5pKZa_8G-Y6qc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "691998612748-ebbld2ohu9j6ln3dlvjc8u9hk1pt3k97.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "691998612748-r932vt3mjfgkmt5h8pkau18pupl0n230.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ashok.flutterFirebase"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
