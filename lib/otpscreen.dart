@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:otp_auth_flutter/detailsScreen.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   TextEditingController otpcontroller = TextEditingController();
+  bool inAsync = false;
 
   get verificationID => widget.verificationId;
 
@@ -22,101 +24,125 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Center(
-          child: SingleChildScrollView(
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.pink[600],
-                  borderRadius: BorderRadius.circular(54)),
-              height: 500,
-              width: 500,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 200,
+    return ModalProgressHUD(
+      inAsyncCall: inAsync,
+      child: SafeArea(
+        child: Scaffold(
+          body: LayoutBuilder(builder: (context, size) {
+            return Center(
+              child: SingleChildScrollView(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.pink[600],
                   ),
-                  Text(
-                    "Enter OTP",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 40),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 30, right: 30),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(40)),
-                      child: TextField(
-                        controller: otpcontroller,
-                        decoration: InputDecoration(
-                          labelText: "Enter OTP",
-                          labelStyle: TextStyle(fontSize: 19),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(width: 5),
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
+                  height: size.maxHeight,
+                  width: size.maxWidth,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          "Enter OTP",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 35,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(40)),
+                            child: TextField(
+                              controller: otpcontroller,
+                              decoration: InputDecoration(
+                                labelText: "Enter OTP",
+                                labelStyle: TextStyle(fontSize: 19),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 5),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(40)),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                            onPressed: () {
+                              AuthCredential phoneAuthCredential =
+                                  PhoneAuthProvider.credential(
+                                      verificationId: verificationID,
+                                      smsCode: otpcontroller.text);
+                              signin(phoneAuthCredential);
+                            },
+                            child: Text("Submit"),
+                            style: ElevatedButton.styleFrom(
+                                shape: StadiumBorder(),
+                                primary: Colors.yellow[700],
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 15),
+                                textStyle: TextStyle(
+                                  fontSize: 20,
+                                ))),
+                        SizedBox(height: 19),
+                        Text(
+                          "Haven't recieved OTP?",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              "Resend",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold),
+                            ))
+                      ],
                     ),
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                      onPressed: () {
-                        AuthCredential phoneAuthCredential =
-                            PhoneAuthProvider.credential(
-                                verificationId: verificationID,
-                                smsCode: otpcontroller.text);
-                        signin(phoneAuthCredential);
-                      },
-                      child: Text("Submit"),
-                      style: ElevatedButton.styleFrom(
-                          shape: StadiumBorder(),
-                          primary: Colors.yellow[700],
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 152, vertical: 15),
-                          textStyle: TextStyle(
-                            fontSize: 20,
-                          ))),
-                  SizedBox(height: 19),
-                  Text(
-                    "Haven't recieved OTP?",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "Resend",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                      ))
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ),
       ),
     );
   }
 
   void signin(AuthCredential phoneAuthCredential) async {
+    if (mounted) {
+      setState(() {
+        inAsync = true;
+      });
+    }
     try {
       final authCred = await _auth.signInWithCredential(phoneAuthCredential);
 
       if (authCred.user != null) {
+        if (mounted) {
+          setState(() {
+            inAsync = false;
+          });
+        }
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => basicDetails()));
       }
     } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        setState(() {
+          inAsync = false;
+        });
+      }
       print(e.message);
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Some Error Occured. Try Again Later')));
